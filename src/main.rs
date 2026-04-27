@@ -1,13 +1,18 @@
-use std::env;
+use std::{env, error::Error};
 
-mod arg_parser;
+use ccwc;
 
 fn main() {
-    println!("Hello, world!");
-
-    let arg = arg_parser::parse_args();
-    match arg {
-        Ok(arg) => println!("{}", arg),
-        Err(e) => println!("FAILED: {}", e),
+    let result = run();
+    match result {
+        Ok(s) => println!("Result: {}", s),
+        Err(e) => println!("Failed: {}", e),
     }
+}
+
+fn run() -> Result<String, Box<dyn Error>> {
+    let arg = ccwc::arg_parser::parse_args()?;
+    let reader = arg.input_source.read()?;
+    let result = arg.operation.run(reader)?;
+    Ok(format!("Op: {}, Result: {}", arg.operation, result))
 }
